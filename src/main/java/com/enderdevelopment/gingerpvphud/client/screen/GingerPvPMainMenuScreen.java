@@ -19,7 +19,7 @@ public class GingerPvPMainMenuScreen extends Screen {
     @Override
     protected void init() {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Play"), button -> {
-            this.client.setScreen(new TitleScreen(false));
+            this.client.setScreen(new TitleScreen());
         }).dimensions(this.width / 2 - 100, this.height / 2 - 24, 200, 20).build());
     }
 
