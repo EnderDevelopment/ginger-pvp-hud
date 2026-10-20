@@ -1,0 +1,65 @@
+plugins {
+    id 'fabric-loom' version '1.2-SNAPSHOT'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+}
+
+extra {
+    apply plugin: 'fabric-loom'
+    minecraft {
+        version = project.property('minecraft_version')
+        runs {
+            client {
+                mainClass = 'net.fabricmc.devlaunchinjector.Main'
+                jvmArgs = [
+                    '-Dfabric.dli.config.dir=${projectDir.absolutePath}/run',
+                    '-Dfabric.dli.env=client'
+                ]
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:${project.property('minecraft_version')}'
+    mappings 'net.fabricmc:yarn:${project.property('minecraft_version')}+build.1:v2'
+    modImplementation 'net.fabricmc:fabric-loader:${project.property('loader_version')}'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.91.0+1.21.11'
+}
+
+processResources {
+    inputs.property 'version', project.property('mod_version')
+    from(sourceSets.main.resources.srcDirs) {
+        include 'fabric.mod.json'
+        expand 'version': project.property('mod_version')
+    }
+    into 'build/resources/main'
+}
+
+jar {
+    from {
+        configurations.compileClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes 'Main-Class': 'net.fabricmc.devlaunchinjector.Main'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = project.property('archives_base_name')
+            groupId = project.property('maven_group')
+        }
+    }
+}
